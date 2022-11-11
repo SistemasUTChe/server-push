@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -26,10 +27,22 @@ app.use(express.static(publicPath));
 const routes = require('./routes');
 app.use('/api', routes );
 
-app.listen(port, (err) => {
 
-    if (err) throw new Error(err);
+// setup a database connection using mongoose
+// paste the connection string given from your atlas server
+mongoose
+  .connect('mongodb+srv://wsanchez:5qqW1V85GYxU1bW6@cluster0.o52zp.mongodb.net/Subscripciones?retryWrites=true&w=majority')
+  .then(result => {
+    console.log("Base de datos conectada");
+//    app.listen(3000);
 
-    console.log(`Servidor corriendo en puerto ${ port }`);
+    app.listen(port, (err) => {
 
-});
+        if (err) throw new Error(err);
+
+        console.log(`Servidor corriendo en puerto ${ port }`);
+
+    });
+
+  })
+  .catch(err => console.log('err', err))

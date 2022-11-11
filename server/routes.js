@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const push = require('./push');
 
+const controller = require('./controllers/controller');
+
 /*const mensajes = [
 
   {
@@ -74,7 +76,9 @@ router.post('/push', (req, res) => {
 });
 
 
+router.get('/subscripciones', controller.getSubscripciones);
 
+router.post('/subscripcion', controller.createSubscripcion);
 
 
 module.exports = router;

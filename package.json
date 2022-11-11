@@ -11,8 +11,9 @@
   "author": "William Sanchez",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
     "body-parser": "^1.18.3",
+    "express": "^4.17.1",
+    "mongoose": "^6.7.2",
     "urlsafe-base64": "^1.0.0",
     "web-push": "^3.3.3"
   },

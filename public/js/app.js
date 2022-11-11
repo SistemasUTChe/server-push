@@ -147,10 +147,10 @@ postBtn.on('click', function() {
     }
 
     var data = {
-        mensaje: mensaje,
+        message: mensaje,
         user: usuario
     };
-
+    
     var notificacion = {
         titulo: "Mensajero de heroes",
         cuerpo: mensaje,
@@ -199,7 +199,31 @@ function getMensajes() {
 
 getMensajes();
 
+function getSubscripciones() {
 
+    fetch('api/subscripciones')
+        .then( res => res.json() )
+        .then( subscripciones => {
+
+            console.log( subscripciones.subscripciones );
+            var contenidos = subscripciones.subscripciones;
+            contenidos.forEach( subscripcion =>{
+                fetch('api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify( subscripcion.content[0] )
+                })
+    
+            });
+
+               // crearMensajeHTML( subscripcion.content ));
+
+
+        });
+
+}
+
+getSubscripciones();
 
 // Detectar cambios de conexión
 function isOnline() {
@@ -326,14 +350,27 @@ btnDesactivadas.on( 'click', function() {
         })
         .then( res => res.toJSON() )
         .then( suscripcion => {
-
+            // console.log(suscripcion);
+            var data = {
+                content: suscripcion,
+            }
+                     
+            fetch('api/subscripcion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify( data )
+            })
+            .then(  console.log )
+            .catch ( error => {
+                console.log(error);
+            });
             // console.log(suscripcion);
             fetch('api/subscribe', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify( suscripcion )
             })
-            .then( verificaSuscripcion )
+            .then(  verificaSuscripcion )
             .catch( cancelarSuscripcion );
 
 
