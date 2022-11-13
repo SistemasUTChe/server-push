@@ -23,8 +23,23 @@ if ( navigator.serviceWorker ) {
 
 }
 
-// Referencias de jQuery
+// Llave googlemap
+var googleMapKey = 'AIzaSyA5mjCwx1TRLuBAjwQw84WE6h5ErSe7Uj8';
 
+// Google Maps llaves alternativas - desarrollo
+// AIzaSyDyJPPlnIMOLp20Ef1LlTong8rYdTnaTXM
+// AIzaSyDzbQ_553v-n8QNs2aafN9QaZbByTyM7gQ
+// AIzaSyA5mjCwx1TRLuBAjwQw84WE6h5ErSe7Uj8
+// AIzaSyCroCERuudf2z02rCrVa6DTkeeneQuq8TA
+// AIzaSyBkDYSVRVtQ6P2mf2Xrq0VBjps8GEcWsLU
+// AIzaSyAu2rb0mobiznVJnJd6bVb5Bn2WsuXP2QI
+// AIzaSyAZ7zantyAHnuNFtheMlJY1VvkRBEjvw9Y
+// AIzaSyDSPDpkFznGgzzBSsYvTq_sj0T0QCHRgwM
+// AIzaSyD4YFaT5DvwhhhqMpDP2pBInoG8BTzA9JY
+// AIzaSyAbPC1F9pWeD70Ny8PHcjguPffSLhT-YF8
+
+
+// Referencias de jQuery
 var titulo      = $('#titulo');
 var nuevoBtn    = $('#nuevo-btn');
 var salirBtn    = $('#salir-btn');
@@ -41,12 +56,22 @@ var txtMensaje  = $('#txtMensaje');
 var btnActivadas    = $('.btn-noti-activadas');
 var btnDesactivadas = $('.btn-noti-desactivadas');
 
+//Geolocalización elementos del html
+var btnLocation      = $('#location-btn');
+
+var modalMapa        = $('.modal-mapa');
+
+
 // El usuario, contiene el ID del hÃ©roe seleccionado
 var usuario;
 
+//Variable geolocalización latitud y longitud
+var lat  = null;
+var lng  = null; 
+
 // ===== Codigo de la aplicación
 
-function crearMensajeHTML(mensaje, personaje) {
+function crearMensajeHTML(mensaje, personaje, lat, lng) {
 
     var content =`
     <li class="animated fadeIn fast">
@@ -65,11 +90,52 @@ function crearMensajeHTML(mensaje, personaje) {
     </li>
     `;
 
+    // si existe la latitud y longitud, 
+    // llamamos la funcion para crear el mapa
+    if ( lat ) {
+        crearMensajeMapa( lat, lng, personaje );
+    }
+    
+    // Borramos la latitud y longitud por si las usó
+    lat = null;
+    lng = null;
+
+    $('.modal-mapa').remove();
+
+
     timeline.prepend(content);
     cancelarBtn.click();
 
 }
 
+function crearMensajeMapa(lat, lng, personaje) {
+
+    let content = `
+    <li class="animated fadeIn fast"
+        data-tipo="mapa"
+        data-user="${ personaje }"
+        data-lat="${ lat }"
+        data-lng="${ lng }">
+                <div class="avatar">
+                    <img src="img/avatars/${ personaje }.jpg">
+                </div>
+                <div class="bubble-container">
+                    <div class="bubble">
+                        <iframe
+                            width="100%"
+                            height="250"
+                            frameborder="0" style="border:0"
+                            src="https://www.google.com/maps/embed/v1/view?key=${ googleMapKey }&center=${ lat },${ lng }&zoom=17" allowfullscreen>
+                            </iframe>
+                    </div>
+                    
+                    <div class="arrow"></div>
+                </div>
+            </li> 
+    `;
+
+    timeline.prepend(content);
+}
 
 
 // Globals
@@ -146,11 +212,19 @@ postBtn.on('click', function() {
         return;
     }
 
-    var data = {
+/*    var data = {
         message: mensaje,
         user: usuario
+    };*/
+
+    var data = {
+        message: mensaje,
+        user: usuario,
+        lat: lat,
+        lng: lng,
     };
-    
+
+
     var notificacion = {
         titulo: "Mensajero de heroes",
         cuerpo: mensaje,
@@ -175,7 +249,7 @@ postBtn.on('click', function() {
     .then( res => console.log( 'app.js', res ))
     .catch( err => console.log( 'app.js error:', err ));
 
-    crearMensajeHTML( mensaje, usuario );
+    crearMensajeHTML( mensaje, usuario, lat, lng );
 
 });
 
@@ -190,7 +264,7 @@ function getMensajes() {
 
             console.log(posts);
             posts.forEach( post =>
-                crearMensajeHTML( post.message, post.user ));
+                crearMensajeHTML( post.message, post.user, post.latitude, post.longitude ));
 
 
         });
@@ -215,9 +289,6 @@ function getSubscripciones() {
                 })
     
             });
-
-               // crearMensajeHTML( subscripcion.content ));
-
 
         });
 
@@ -399,5 +470,47 @@ btnActivadas.on( 'click', function() {
 
     cancelarSuscripcion();
 
+
+});
+
+// Crear mapa en el modal
+function mostrarMapaModal(lat, lng) {
+
+    $('.modal-mapa').remove();
+    
+    var content = `
+            <div class="modal-mapa">
+                <iframe
+                    width="100%"
+                    height="250"
+                    frameborder="0"
+                    src="https://www.google.com/maps/embed/v1/view?key=${ googleMapKey }&center=${ lat },${ lng }&zoom=17" allowfullscreen>
+                    </iframe>
+            </div>
+    `;
+
+    modal.append( content );
+}
+
+// Obtener la geolocalización
+btnLocation.on('click', () => {
+
+    // console.log('Botón geolocalización');
+    $.mdtoast('Cargando mapa...', {
+        interaction: true,
+        interactionTimeout: 2000,
+        actionText: 'Ok!'
+    });
+
+
+    navigator.geolocation.getCurrentPosition( pos => {
+
+        console.log( pos );
+        mostrarMapaModal( pos.coords.latitude, pos.coords.longitude );
+
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+
+    });
 
 });
