@@ -64,7 +64,7 @@ module.exports.sendPush = ( post ) => {
 
         suscripciones = suscripciones.filter( subs => !subs.borrar );
 
-        fs.writeFileSync(`${ __dirname }/subs-db.json`, JSON.stringify(suscripciones) );
+        //fs.writeFileSync(`${ __dirname }/subs-db.json`, JSON.stringify(suscripciones) );
 
     });
 
