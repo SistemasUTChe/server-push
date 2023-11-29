@@ -276,7 +276,7 @@ postBtn.on('click', function() {
     })
     .then( console.log );
 
-    fetch('https://www.pruebas-utche.website/api/messages', {
+    fetch('http://proyectoPWA.test/api/messages', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -297,7 +297,7 @@ postBtn.on('click', function() {
 // Obtener mensajes del servidor
 function getMensajes() {
 
-    fetch('https://www.pruebas-utche.website/api/messages')
+    fetch('http://proyectoPWA.test/api/messages')
         .then( res => res.json() )
         .then( posts => {
 
